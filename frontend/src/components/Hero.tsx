@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Button from './Button'
 
 function Hero() {
   const [started, setStarted] = useState(false)
@@ -13,9 +14,10 @@ function Hero() {
           : 'Track applications, analyze resumes, and discover the best opportunities using AI.'}
       </p>
 
-      <button onClick={() => setStarted(true)}>
-        {started ? 'Ready!' : 'Get Started'}
-      </button>
+      <Button
+  text={started ? 'Ready!' : 'Get Started'}
+  onClick={() => setStarted(true)}
+/>
     </main>
   )
 }
