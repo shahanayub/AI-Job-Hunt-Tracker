@@ -25,8 +25,11 @@ function App() {
   return (
     <>
       <Navbar />
-      <Hero />
-      <Features />
+      <Hero
+  title="Land Your Dream Job with AI"
+  subtitle="Track applications, analyze resumes, and discover the best opportunities using AI."
+/>
+      <Features features={features} />
     </>
   )
 }
