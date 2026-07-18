@@ -1,22 +1,13 @@
-function Features() {
-  const features = [
-    {
-      title: '📄 Resume Analysis',
-      description: 'Get instant AI feedback to improve your resume.',
-    },
-    {
-      title: '💼 Job Tracking',
-      description: 'Keep all your job applications organized in one place.',
-    },
-    {
-      title: '🤖 AI Career Assistant',
-      description: 'Discover personalized job opportunities using AI.',
-    },
-    {
-  title: '🎯 Interview Practice',
-  description: 'Practice mock interviews with AI and improve your confidence.',
-    },
-  ]
+type Feature = {
+  title: string
+  description: string
+}
+type FeaturesProps = {
+  features: Feature[]
+}
+function Features({features} : FeaturesProps) {
+  
+
 
   return (
     <section className="features">
