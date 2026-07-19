@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import JobForm from '../components/JobForm'
 
 function Dashboard() {
   return (
@@ -6,6 +7,8 @@ function Dashboard() {
       <h1>Dashboard</h1>
 
       <p>Welcome to your AI Job Hunt Tracker Dashboard!</p>
+
+<JobForm />
 
       <Link to="/">
         ← Back to Home
