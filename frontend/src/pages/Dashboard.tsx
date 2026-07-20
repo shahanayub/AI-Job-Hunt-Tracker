@@ -8,6 +8,11 @@ function Dashboard() {
 function addJob(job: any) {
   setJobs([...jobs, job])
 } 
+function deleteJob(indexToDelete: number) {
+  setJobs(
+    jobs.filter((_, index) => index !== indexToDelete)
+  )
+}
   return (
     <div>
       <h1>Dashboard</h1>
@@ -21,6 +26,9 @@ function addJob(job: any) {
     <h3>{job.company}</h3>
     <p>{job.position}</p>
     <p>{job.status}</p>
+    <button onClick={() => deleteJob(index)}>
+    Delete
+    </button>
     <hr />
   </div>
 ))}
