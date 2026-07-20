@@ -1,13 +1,18 @@
 import { useState } from 'react'
-function JobForm() {
+type JobFormProps = {
+  onAddJob: (job: any) => void
+}
+function JobForm({ onAddJob }: JobFormProps) {
     const [company, setCompany] = useState('')
     const [position, setPosition] = useState('')
     const [status, setStatus] = useState('Applied')
 function handleSubmit() {
-  console.log('Company:', company)
-  console.log('Position:', position)
-  console.log('Status:', status)
-}    
+  onAddJob({
+    company,
+    position,
+    status,
+  })
+}  
   return (
     <div className="job-form">
       <h2>Add New Job</h2>
