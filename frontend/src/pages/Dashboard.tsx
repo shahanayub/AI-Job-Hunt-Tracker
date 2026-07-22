@@ -35,6 +35,9 @@ function deleteJob(indexToDelete: number) {
   <p>No jobs added yet.</p>
 )}
 
+<p>Total Jobs: {jobs.length}</p>
+
+
 {jobs.map((job: any, index) => (
   <div key={index}>
     <h3>{job.company}</h3>
