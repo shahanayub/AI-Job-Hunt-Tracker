@@ -31,6 +31,9 @@ function deleteJob(indexToDelete: number) {
   onAddJob={addJob}
   editingJob={editingJob}
 />
+{jobs.length === 0 && (
+  <p>No jobs added yet.</p>
+)}
 
 {jobs.map((job: any, index) => (
   <div key={index}>
