@@ -37,12 +37,24 @@ function deleteJob(indexToDelete: number) {
 
 <p>Total Jobs: {jobs.length}</p>
 
-
 {jobs.map((job: any, index) => (
   <div key={index}>
     <h3>{job.company}</h3>
     <p>{job.position}</p>
-    <p>{job.status}</p>
+    <p
+  style={{
+    color:
+      job.status === 'Offer'
+        ? 'green'
+        : job.status === 'Rejected'
+        ? 'red'
+        : job.status === 'Interview'
+        ? 'orange'
+        : 'blue',
+  }}
+>
+  {job.status}
+  </p>
     <button
   onClick={() =>
     setEditingJob({
