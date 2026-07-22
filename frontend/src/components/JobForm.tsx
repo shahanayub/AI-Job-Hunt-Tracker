@@ -32,7 +32,9 @@ function JobForm({ onAddJob, editingJob }: JobFormProps) {
 
   return (
     <div className="job-form">
-      <h2>Add New Job</h2>
+      <h2>
+     {editingJob ? 'Edit Job' : 'Add New Job'}
+    </h2>
 
       <input
         type="text"
