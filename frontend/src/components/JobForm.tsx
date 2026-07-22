@@ -60,9 +60,12 @@ function JobForm({ onAddJob, editingJob }: JobFormProps) {
         <option>Offer</option>
       </select>
 
-      <button onClick={handleSubmit}>
-        Save Job
-      </button>
+      <button
+  onClick={handleSubmit}
+  disabled={!company || !position}
+>
+  {editingJob ? 'Update Job' : 'Save Job'}
+    </button>
     </div>
   )
 }
