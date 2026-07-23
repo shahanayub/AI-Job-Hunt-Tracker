@@ -1,10 +1,16 @@
 import { Link } from 'react-router-dom'
 import JobForm from '../components/JobForm'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 function Dashboard() {
-  const [jobs, setJobs] = useState([])
+  const [jobs, setJobs] = useState(() => {
+  const savedJobs = localStorage.getItem('jobs')
+  return savedJobs ? JSON.parse(savedJobs) : []
+})
   const [editingJob, setEditingJob] = useState<any>(null)  
+  useEffect(() => {
+  localStorage.setItem('jobs', JSON.stringify(jobs))
+}, [jobs])
 
 function addJob(job: any) {
   if (editingJob) {
