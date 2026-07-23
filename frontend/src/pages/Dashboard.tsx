@@ -28,10 +28,12 @@ function deleteJob(indexToDelete: number) {
   )
 }
   return (
-    <div>
+  <div className="dashboard">
       <h1>Dashboard</h1>
+<p className="subtitle">
+  Track your applications in one place.
+</p>
 
-      <p>Welcome to your AI Job Hunt Tracker Dashboard!</p>
 
 <JobForm
   onAddJob={addJob}
@@ -44,38 +46,33 @@ function deleteJob(indexToDelete: number) {
 <p>Total Jobs: {jobs.length}</p>
 
 {jobs.map((job: any, index) => (
-  <div key={index}>
-    <h3>{job.company}</h3>
+ <div key={index} className="job-card">
+    <h2>{job.company}</h2>
     <p>{job.position}</p>
-    <p
-  style={{
-    color:
-      job.status === 'Offer'
-        ? 'green'
-        : job.status === 'Rejected'
-        ? 'red'
-        : job.status === 'Interview'
-        ? 'orange'
-        : 'blue',
-  }}
->
+ <p className={`status ${job.status.toLowerCase()}`}>
   {job.status}
-  </p>
-    <button
+</p>
+    <div className="job-actions">
+  <button
+  className="edit-btn"
   onClick={() =>
     setEditingJob({
       job,
       index,
-      })
-      }
-    >
-      Edit
-    </button>
-    <button onClick={() => deleteJob(index)}>
-      Delete
-    </button>
+    })
+  }
+>
+  Edit
+</button>
 
-    <hr />
+<button
+  className="delete-btn"
+  onClick={() => deleteJob(index)}
+>
+  Delete
+</button>
+</div>
+
   </div>
 ))}
 

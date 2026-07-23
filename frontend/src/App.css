@@ -109,3 +109,132 @@
   color: #666;
   line-height: 1.6;
 }
+
+/* ---------- DASHBOARD SECTION ---------- */
+
+.job-card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.job-form {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+}
+
+.job-form input,
+.job-form select {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.job-form button {
+  width: 100%;
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.job-form button:hover {
+  background: #1d4ed8;
+}
+
+.job-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.job-card h2 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.edit-btn {
+  background: #f59e0b;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.delete-btn {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.job-card p {
+  margin: 8px 0;
+}
+
+body {
+  background-color: #eef2f7;
+  font-family: Arial, sans-serif;
+  margin: 0;
+}
+
+h1 {
+  margin-bottom: 5px;
+}
+
+.subtitle {
+  color: #6b7280;
+  margin-top: 0;
+  margin-bottom: 30px;
+}
+
+.status {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  color: white;
+  font-weight: bold;
+}
+
+.applied {
+  background: #2563eb;
+}
+
+.interview {
+  background: #f59e0b;
+}
+
+.offer {
+  background: #16a34a;
+}
+
+.rejected {
+  background: #dc2626;
+}
+
+.job-card:hover {
+  transform: translateY(-4px);
+  transition: 0.2s ease;
+}
