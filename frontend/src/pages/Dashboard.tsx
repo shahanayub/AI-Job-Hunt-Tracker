@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import JobForm from '../components/JobForm'
 import { useState, useEffect } from 'react'
 
+
 function Dashboard() {
   const [jobs, setJobs] = useState(() => {
   const savedJobs = localStorage.getItem('jobs')
@@ -46,7 +47,8 @@ const rejectedJobs = jobs.filter(
 
 return (
   <div className="dashboard">
-      <h1>Dashboard</h1>
+
+    <h1>Dashboard</h1>
 <p className="subtitle">
   Track your applications in one place.
 </p>
