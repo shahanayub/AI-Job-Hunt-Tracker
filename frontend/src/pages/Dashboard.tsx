@@ -27,7 +27,24 @@ function deleteJob(indexToDelete: number) {
     jobs.filter((_, index) => index !== indexToDelete)
   )
 }
-  return (
+
+const appliedJobs = jobs.filter(
+  (job) => job.status === 'Applied'
+).length
+
+const interviewJobs = jobs.filter(
+  (job) => job.status === 'Interview'
+).length
+
+const offerJobs = jobs.filter(
+  (job) => job.status === 'Offer'
+).length
+
+const rejectedJobs = jobs.filter(
+  (job) => job.status === 'Rejected'
+).length
+
+return (
   <div className="dashboard">
       <h1>Dashboard</h1>
 <p className="subtitle">
@@ -40,10 +57,19 @@ function deleteJob(indexToDelete: number) {
   editingJob={editingJob}
 />
 {jobs.length === 0 && (
-  <p>No jobs added yet.</p>
+  <p className= "empty-message">
+    No jobs added yet.</p>
 )}
 
-<p>Total Jobs: {jobs.length}</p>
+<p className="total-jobs">
+  Total Jobs: {jobs.length}</p>
+
+<div className="job-stats">
+  <p>🟦 Applied: {appliedJobs}</p>
+  <p>🟧 Interview: {interviewJobs}</p>
+  <p>🟩 Offers: {offerJobs}</p>
+  <p>🟥 Rejected: {rejectedJobs}</p>
+</div>
 
 {jobs.map((job: any, index) => (
  <div key={index} className="job-card">
@@ -76,9 +102,9 @@ function deleteJob(indexToDelete: number) {
   </div>
 ))}
 
-      <Link to="/">
-        ← Back to Home
-      </Link>
+      <Link to="/" className="back-link">
+  ← Back to Home
+</Link>
     </div>
   )
 }
