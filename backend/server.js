@@ -6,6 +6,8 @@ app.use(express.json())
 
 const jobs = []
 
+let nextId = 1
+
 const PORT = 5000
 
 app.get('/', (req, res) => {
@@ -18,9 +20,15 @@ app.get('/jobs', (req, res) => {
 
 app.post('/jobs', (req, res) => {
 
-  jobs.push(req.body)
+  const newJob = {
+    id: nextId,
+    ...req.body,
+  }
 
-  console.log("POST route hit!")
+  nextId++
+
+  jobs.push(newJob)
+
   console.log(jobs)
 
   res.json({
