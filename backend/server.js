@@ -40,3 +40,18 @@ app.post('/jobs', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`)
 })
+
+app.delete('/jobs/:id', (req, res) => {
+
+  const id = Number(req.params.id)
+
+  const updatedJobs = jobs.filter(job => job.id !== id)
+
+  jobs.length = 0
+  jobs.push(...updatedJobs)
+
+  res.json({
+    message: "Job deleted successfully!"
+  })
+
+})
