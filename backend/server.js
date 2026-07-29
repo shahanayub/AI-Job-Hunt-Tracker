@@ -1,3 +1,5 @@
+require('dotenv').config()
+const mongoose = require('mongoose')
 const cors = require('cors')
 const express = require('express')
 
@@ -11,6 +13,9 @@ const jobs = []
 let nextId = 1
 
 const PORT = 5000
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch((err) => console.log(err))
 
 app.get('/', (req, res) => {
   res.send("Backend is running!")
