@@ -276,3 +276,10 @@ h1 {
   margin: 20px 0;
 }
 
+
+/* Text area */
+
+textarea {
+  resize: vertical;
+  width: 100%;
+}

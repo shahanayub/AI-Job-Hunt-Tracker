@@ -1,6 +1,8 @@
 const scrapeGoogle = require("./scrapers/googlejobs");
 const scrapeLinkedIn = require("./scrapers/linkedinjobs");
 
+const Job = require("./models/Job");
+
 require('dotenv').config()
 const mongoose = require('mongoose')
 const cors = require('cors')
@@ -11,9 +13,6 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-const jobs = []
-
-let nextId = 1
 
 const PORT = 5000
 mongoose.connect(process.env.MONGODB_URI)
@@ -24,70 +23,82 @@ app.get('/', (req, res) => {
   res.send("Backend is running!")
 })
 
-app.get('/jobs', (req, res) => {
-  res.json(jobs)
-})
+app.get("/jobs", async (req, res) => {
+  const jobs = await Job.find();
+  res.json(jobs);
+});
 
-app.post('/jobs', (req, res) => {
+app.post("/jobs", async (req, res) => {
 
-  const newJob = {
-    id: nextId,
-    ...req.body,
-  }
+  const job = await Job.create({
+    company: req.body.company,
+    position: req.body.position,
+    description: req.body.description || "",
+    url: req.body.url || "",
+    status: req.body.status || "Applied",
+    notes: req.body.notes || "",
+    followUpDate: req.body.followUpDate || null,
+    matchScore: req.body.matchScore || 0,
+    statusHistory: [
+      {
+        status: req.body.status || "Applied",
+      },
+    ],
+  });
 
-  nextId++
+  res.json(job);
 
-  jobs.push(newJob)
+});
 
-  console.log(jobs)
+app.delete("/jobs/:id", async (req, res) => {
 
-  res.json({
-    message: "Job added successfully!"
-  })
-
-})
-
-app.delete('/jobs/:id', (req, res) => {
-
-  const id = Number(req.params.id)
-
-  const updatedJobs = jobs.filter(job => job.id !== id)
-
-  jobs.length = 0
-  jobs.push(...updatedJobs)
-
-  console.log(jobs)
+  await Job.findByIdAndDelete(req.params.id);
 
   res.json({
-    message: "Job deleted successfully!"
-  })
+    message: "Job deleted successfully",
+  });
 
-})
+});
 
-app.put('/jobs/:id', (req, res) => {
+app.put("/jobs/:id", async (req, res) => {
 
-  const id = Number(req.params.id)
+  const oldJob = await Job.findById(req.params.id);
 
-  const job = jobs.find(job => job.id === id)
-
-  if (!job) {
+  if (!oldJob) {
     return res.status(404).json({
-      message: "Job not found"
-    })
+      message: "Job not found",
+    });
   }
 
-  job.company = req.body.company
-  job.position = req.body.position
-  job.status = req.body.status
+  const history = oldJob.statusHistory;
 
-  console.log(jobs)
+  if (oldJob.status !== req.body.status) {
+    history.push({
+      status: req.body.status,
+    });
+  }
 
-  res.json({
-    message: "Job updated successfully!",
-    job
-  })
+  const updatedJob = await Job.findByIdAndUpdate(
+    req.params.id,
+    {
+      company: req.body.company,
+      position: req.body.position,
+      description: req.body.description,
+      url: req.body.url,
+      status: req.body.status,
+      notes: req.body.notes,
+      followUpDate: req.body.followUpDate,
+      matchScore: req.body.matchScore,
+      statusHistory: history,
+    },
+    {
+      new: true,
+    }
+  );
 
-})
+  res.json(updatedJob);
+
+});
 
 app.post("/scrape", async (req, res) => {
   try {
