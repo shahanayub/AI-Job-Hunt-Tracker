@@ -1,3 +1,6 @@
+const scrapeGoogle = require("./scrapers/googlejobs");
+const scrapeLinkedIn = require("./scrapers/linkedinjobs");
+
 require('dotenv').config()
 const mongoose = require('mongoose')
 const cors = require('cors')
@@ -85,6 +88,37 @@ app.put('/jobs/:id', (req, res) => {
   })
 
 })
+
+app.post("/scrape", async (req, res) => {
+  try {
+    const { url } = req.body;
+
+    let job;
+
+    if (url.includes("google.com")) {
+      job = await scrapeGoogle(url);
+    }
+
+    else if (url.includes("linkedin.com")) {
+      job = await scrapeLinkedIn(url);
+    }
+
+    else {
+      return res.status(400).json({
+        message: "Unsupported website"
+      });
+    }
+
+    res.json(job);
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      message: "Scraping failed"
+    });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`)
