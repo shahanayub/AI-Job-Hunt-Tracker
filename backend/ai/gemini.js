@@ -1,12 +1,8 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const { GoogleGenAI } = require("@google/genai");
 
 async function analyzeResume(resumeText, jobDescription) {
-
-  const model = genAI.getGenerativeModel({
-    model: "gemini-2.5-flash",
-  });
+  // Pass the key explicitly
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
   const prompt = `
 You are an ATS (Applicant Tracking System).
@@ -29,10 +25,15 @@ Return ONLY valid JSON in this format:
 }
 `;
 
-  const result = await model.generateContent(prompt);
+  const response = await ai.models.generateContent({
+    model: "gemini-3.1-flash-lite",
+    contents: prompt,
+    config: {
+      responseMimeType: "application/json",
+    },
+  });
 
-  return result.response.text();
-
+  return response.text;
 }
 
 module.exports = {

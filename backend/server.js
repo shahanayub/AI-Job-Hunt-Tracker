@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 const scrapeGoogle = require("./scrapers/googlejobs");
 const scrapeLinkedIn = require("./scrapers/linkedinjobs");
 
@@ -7,21 +9,18 @@ const resumeRoutes = require("./routes/resume");
 
 const { analyzeResume } = require("./ai/gemini");
 
-require('dotenv').config()
 const mongoose = require('mongoose')
 const cors = require('cors')
 const express = require('express')
 
 const app = express()
 
-console.log(process.env.GEMINI_API_KEY);
-
 app.use(cors())
 app.use(express.json())
 app.use("/resume", resumeRoutes);
 
-
 const PORT = 5000
+
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => console.log(err))
@@ -108,7 +107,9 @@ app.put("/jobs/:id", async (req, res) => {
 });
 
 app.post("/scrape", async (req, res) => {
+
   try {
+
     const { url } = req.body;
 
     let job;
@@ -123,25 +124,26 @@ app.post("/scrape", async (req, res) => {
 
     else {
       return res.status(400).json({
-        message: "Unsupported website"
+        message: "Unsupported website",
       });
     }
 
     res.json(job);
 
   } catch (err) {
+
     console.error(err);
 
     res.status(500).json({
-      message: "Scraping failed"
+      message: "Scraping failed",
     });
+
   }
+
 });
 
 app.post("/analyze", async (req, res) => {
-
   try {
-
     const { resumeText, jobDescription } = req.body;
 
     if (!resumeText || !jobDescription) {
@@ -150,28 +152,20 @@ app.post("/analyze", async (req, res) => {
       });
     }
 
-    const result = await analyzeResume(
-      resumeText,
-      jobDescription
-    );
+    const rawResult = await analyzeResume(resumeText, jobDescription);
 
     res.json({
-      result,
+      result: JSON.parse(rawResult), // Parse the string into a clean JSON object
     });
 
   } catch (err) {
-
-    console.log(err);
-
+    console.error(err);
     res.status(500).json({
       message: "Gemini analysis failed.",
     });
-
   }
-
 });
-
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`)
-})
+});
