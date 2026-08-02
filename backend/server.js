@@ -3,6 +3,8 @@ const scrapeLinkedIn = require("./scrapers/linkedinjobs");
 
 const Job = require("./models/Job");
 
+const resumeRoutes = require("./routes/resume");
+
 require('dotenv').config()
 const mongoose = require('mongoose')
 const cors = require('cors')
@@ -12,6 +14,8 @@ const app = express()
 
 app.use(cors())
 app.use(express.json())
+
+app.use("/resume", resumeRoutes);
 
 
 const PORT = 5000
