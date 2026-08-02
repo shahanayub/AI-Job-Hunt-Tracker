@@ -5,6 +5,8 @@ const Job = require("./models/Job");
 
 const resumeRoutes = require("./routes/resume");
 
+const { analyzeResume } = require("./ai/gemini");
+
 require('dotenv').config()
 const mongoose = require('mongoose')
 const cors = require('cors')
@@ -12,9 +14,10 @@ const express = require('express')
 
 const app = express()
 
+console.log(process.env.GEMINI_API_KEY);
+
 app.use(cors())
 app.use(express.json())
-
 app.use("/resume", resumeRoutes);
 
 
@@ -134,6 +137,40 @@ app.post("/scrape", async (req, res) => {
     });
   }
 });
+
+app.post("/analyze", async (req, res) => {
+
+  try {
+
+    const { resumeText, jobDescription } = req.body;
+
+    if (!resumeText || !jobDescription) {
+      return res.status(400).json({
+        message: "Missing resume or job description.",
+      });
+    }
+
+    const result = await analyzeResume(
+      resumeText,
+      jobDescription
+    );
+
+    res.json({
+      result,
+    });
+
+  } catch (err) {
+
+    console.log(err);
+
+    res.status(500).json({
+      message: "Gemini analysis failed.",
+    });
+
+  }
+
+});
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`)

@@ -18,7 +18,7 @@ function Dashboard() {
 
   async function addJob(job: any) {
     if (editingJob) {
-      await fetch(`http://localhost:5000/jobs/${editingJob.id}`, {
+      await fetch(`http://localhost:5000/jobs/${editingJob._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -50,7 +50,7 @@ function Dashboard() {
     }
   }
 
-  async function deleteJob(jobId: number) {
+  async function deleteJob(jobId: string) {
     await fetch(`http://localhost:5000/jobs/${jobId}`, {
       method: "DELETE",
     })
@@ -90,7 +90,7 @@ function Dashboard() {
       </div>
 
       {jobs.map((job: any) => (
-        <div key={job.id} className="job-card">
+        <div key={job._id} className="job-card">
           <h2>{job.company}</h2>
           <p>{job.position}</p>
 
@@ -103,7 +103,7 @@ function Dashboard() {
               Edit
             </button>
 
-            <button className="delete-btn" onClick={() => deleteJob(job.id)}>
+            <button className="delete-btn" onClick={() => deleteJob(job._id)}>
               Delete
             </button>
           </div>

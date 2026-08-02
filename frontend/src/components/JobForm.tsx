@@ -60,7 +60,9 @@ async function handleScrape() {
 
   } catch {
 
-    setError("Scraping failed.");
+    setError(
+    "Scraping failed. If the website blocks automation, please paste the job description below."
+);
 
   }
 
@@ -129,6 +131,11 @@ async function handleScrape() {
       value={position}
       onChange={(e) => setPosition(e.target.value)}
     />
+
+    <h3>Job Description (Auto-filled or Manual)</h3>
+    <p style={{ fontSize: "14px", color: "gray" }}>
+    If scraping fails, simply copy the job description from the website and paste it below.
+    </p>
 
     {/* Description */}
     <textarea
