@@ -9,6 +9,9 @@ const upload = multer({
   dest: "uploads/",
 });
 
+// Stores the latest uploaded resume text
+let latestResumeText = "";
+
 router.post("/upload", upload.single("resume"), async (req, res) => {
 
   try {
@@ -19,8 +22,10 @@ router.post("/upload", upload.single("resume"), async (req, res) => {
 
     fs.unlinkSync(req.file.path);
 
+    latestResumeText = pdf.text;
+
     res.json({
-      text: pdf.text,
+      text: latestResumeText,
     });
 
   } catch (err) {
@@ -32,6 +37,15 @@ router.post("/upload", upload.single("resume"), async (req, res) => {
     });
 
   }
+
+});
+
+// Returns the latest uploaded resume
+router.get("/latest", (req, res) => {
+
+  res.json({
+    text: latestResumeText,
+  });
 
 });
 
