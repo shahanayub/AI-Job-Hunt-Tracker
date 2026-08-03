@@ -45,21 +45,19 @@ const jobSchema = new mongoose.Schema({
     default: 0,
   },
 
-  analysis: {
-    strengths: {
-      type: [String],
-      default: [],
-    },
+  strengths: {
+    type: [String],
+    default: [],
+  },
 
-    missingSkills: {
-      type: [String],
-      default: [],
-    },
+  missingSkills: {
+    type: [String],
+    default: [],
+  },
 
-    suggestions: {
-      type: [String],
-      default: [],
-    },
+  suggestions: {
+    type: [String],
+    default: [],
   },
 
   statusHistory: [
