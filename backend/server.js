@@ -243,6 +243,26 @@ app.get("/jobs/stats", async (req, res) => {
 });
 
 
+app.post("/generate-email", async (req, res) => {
+  try {
+    const { company, position, notes } = req.body;
+
+    const prompt = `Write a polite, professional follow-up email to the hiring manager at ${company} regarding my application for the ${position} position.
+    Context/Notes: ${notes || "Checking in on application status."}
+    
+    Return pure JSON with keys: "subject" and "body". No markdown formatting or extra text outside JSON.`;
+
+    const rawResult = await analyzeResume(prompt, "Email Generation Context");
+    const result = JSON.parse(rawResult);
+
+    res.json(result);
+  } catch (err) {
+    console.error("Email Generation Error:", err);
+    res.status(500).json({ message: "Failed to generate follow up email draft." });
+  }
+});
+
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`)
 });
