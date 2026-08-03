@@ -186,6 +186,63 @@ app.post("/analyze", async (req, res) => {
   }
 });
 
+app.get("/jobs/stats", async (req, res) => {
+  try {
+    const totalJobs = await Job.countDocuments();
+    
+    // Aggregate count by status
+    const statusCounts = await Job.aggregate([
+      { $group: { _id: "$status", count: { $sum: 1 } } }
+    ]);
+
+    // Format status counts into clean object
+    const statusMap = {
+      Saved: 0,
+      Applied: 0,
+      Interview: 0,
+      Offer: 0,
+      Rejected: 0
+    };
+
+    statusCounts.forEach((item) => {
+      if (item._id in statusMap) {
+        statusMap[item._id] = item.count;
+      }
+    });
+
+    // Calculate Average ATS Match Score
+    const avgScoreResult = await Job.aggregate([
+      { $match: { matchScore: { $gt: 0 } } },
+      { $group: { _id: null, avgScore: { $avg: "$matchScore" } } }
+    ]);
+
+    const avgMatchScore = avgScoreResult.length > 0 ? Math.round(avgScoreResult[0].avgScore) : 0;
+
+    // Response rate (Interview + Offer) / Total Applied
+    const totalAppliedOrHigher = statusMap.Applied + statusMap.Interview + statusMap.Offer + statusMap.Rejected;
+    const totalPositiveResponses = statusMap.Interview + statusMap.Offer;
+    const responseRate = totalAppliedOrHigher > 0 ? Math.round((totalPositiveResponses / totalAppliedOrHigher) * 100) : 0;
+
+    res.json({
+      totalJobs,
+      statusMap,
+      avgMatchScore,
+      responseRate,
+      chartData: [
+        { name: "Saved", value: statusMap.Saved, fill: "#94a3b8" },
+        { name: "Applied", value: statusMap.Applied, fill: "#3b82f6" },
+        { name: "Interview", value: statusMap.Interview, fill: "#f97316" },
+        { name: "Offer", value: statusMap.Offer, fill: "#22c55e" },
+        { name: "Rejected", value: statusMap.Rejected, fill: "#ef4444" },
+      ]
+    });
+  } catch (err) {
+    console.error("Stats Aggregation Error:", err);
+    res.status(500).json({ message: "Failed to fetch stats" });
+  }
+});
+
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`)
 });
