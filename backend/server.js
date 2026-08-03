@@ -144,22 +144,41 @@ app.post("/scrape", async (req, res) => {
 
 app.post("/analyze", async (req, res) => {
   try {
-    const { resumeText, jobDescription } = req.body;
+    const { jobId, resumeText, jobDescription } = req.body;
 
-    if (!resumeText || !jobDescription) {
-      return res.status(400).json({
-        message: "Missing resume or job description.",
-      });
-    }
+    console.log({
+  jobId,
+  resumeText,
+  jobDescription,
+});
 
-    const rawResult = await analyzeResume(resumeText, jobDescription);
+if (!jobId || !resumeText || !jobDescription) {
+  return res.status(400).json({
+    message: "Missing job, resume or job description.",
+  });
+}
 
-    res.json({
-      result: JSON.parse(rawResult), // Parse the string into a clean JSON object
+    const rawResult = await analyzeResume(
+      resumeText,
+      jobDescription
+    );
+
+    const result = JSON.parse(rawResult);
+
+    await Job.findByIdAndUpdate(jobId, {
+      matchScore: result.matchScore,
+      analysis: {
+        strengths: result.strengths,
+        missingSkills: result.missingSkills,
+        suggestions: result.suggestions,
+      },
     });
+
+    res.json(result);
 
   } catch (err) {
     console.error(err);
+
     res.status(500).json({
       message: "Gemini analysis failed.",
     });

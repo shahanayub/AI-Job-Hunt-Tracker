@@ -1,7 +1,10 @@
+
 const express = require("express");
 const multer = require("multer");
 const pdfParse = require("pdf-parse");
 const fs = require("fs");
+
+let latestResumeText = "";
 
 const router = express.Router();
 
@@ -10,7 +13,7 @@ const upload = multer({
 });
 
 // Stores the latest uploaded resume text
-let latestResumeText = "";
+
 
 router.post("/upload", upload.single("resume"), async (req, res) => {
 
@@ -19,6 +22,11 @@ router.post("/upload", upload.single("resume"), async (req, res) => {
     const dataBuffer = fs.readFileSync(req.file.path);
 
     const pdf = await pdfParse(dataBuffer);
+    latestResumeText = pdf.text;
+
+    console.log("Resume uploaded!");
+console.log("Characters:", pdf.text.length);
+
 
     fs.unlinkSync(req.file.path);
 
