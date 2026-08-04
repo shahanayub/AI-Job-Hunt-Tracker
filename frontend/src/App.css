@@ -7,13 +7,15 @@
 
   padding: 20px 10%;
 
-  background: #d0d5da;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
 
-  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.12);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
 }
 
 .navbar h2 {
   font-size: 1.8rem;
+  color: #0f172a;
 }
 
 .nav-links {
@@ -24,13 +26,13 @@
 
 .nav-links a {
   text-decoration: none;
-  color: #222;
+  color: #475569;
   font-weight: 500;
   transition: color 0.3s ease;
 }
 
 .nav-links a:hover {
-  color: #2563eb;
+  color: #4f46e5;
 }
 
 /* ---------- HERO SECTION ---------- */
@@ -38,36 +40,39 @@
 .hero {
   text-align: center;
   padding: 100px 10%;
+  background: #f8fafc;
 }
 
 .hero h1 {
   font-size: 3rem;
   margin-bottom: 20px;
+  color: #0f172a;
 }
 
 .hero p {
   font-size: 1.2rem;
-  color: #666;
+  color: #64748b;
   max-width: 700px;
   margin: 0 auto 30px;
   line-height: 1.6;
 }
 
 .hero button {
-  background-color: #2563eb;
+  background-color: #4f46e5;
   color: white;
   border: none;
   padding: 14px 28px;
   font-size: 1rem;
   border-radius: 10px;
   cursor: pointer;
-  transition: transform 0.3s ease;
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+  transition: transform 0.3s ease, background-color 0.3s ease;
 }
 
 .hero button:hover {
   transform: scale(1.05);
+  background-color: #4338ca;
 }
-
 /* ---------- FEATURES SECTION ---------- */
 
 .features {
