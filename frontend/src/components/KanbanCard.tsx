@@ -82,16 +82,36 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
     }
   };
 
- const handleOpenMailClient = () => {
-    if (!emailDraft) return;
+ const handleSendEmailViaApi = async () => {
+  if (!emailDraft) return;
 
-    // Direct Gmail Web Compose URL (bypasses Outlook)
-    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&tf=1&su=${encodeURIComponent(
-      emailDraft.subject
-    )}&body=${encodeURIComponent(emailDraft.body)}`;
+  try {
+    const res = await fetch("http://localhost:5000/api/send-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        to: job.companyEmail || "recruiter@example.com",
+        subject: emailDraft.subject,
+        body: emailDraft.body,
+      }),
+    });
 
-    window.open(gmailUrl, "_blank");
-  };
+    const data = await res.json();
+
+    if (res.status === 401) {
+      // Prompt user to authenticate if tokens aren't set
+      const authRes = await fetch("http://localhost:5000/api/auth/google");
+      const { url } = await authRes.json();
+      window.open(url, "_blank");
+    } else if (data.success) {
+      alert("🚀 Email dispatched successfully via Gmail API!");
+      setShowEmailModal(false);
+    }
+  } catch (err) {
+    console.error("Email dispatch error:", err);
+    alert("Failed to send email.");
+  }
+};
 
   return (
     <div ref={setNodeRef} style={style}>
@@ -374,7 +394,7 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
                       Close
                     </button>
                     <button
-                      onClick={handleOpenMailClient}
+                      onClick={handleSendEmailViaApi}
                       style={{
                         padding: "6px 12px",
                         borderRadius: "4px",
