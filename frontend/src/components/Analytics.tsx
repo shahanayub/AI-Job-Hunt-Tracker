@@ -9,11 +9,19 @@ import {
   Cell,
 } from "recharts";
 
+interface IndustryStat {
+  industry: string;
+  total: number;
+  responses: number;
+  responseRate: number;
+}
+
 interface StatsData {
   totalJobs: number;
   avgMatchScore: number;
   responseRate: number;
   chartData: { name: string; value: number; fill: string }[];
+  industryStats: IndustryStat[];
 }
 
 export const Analytics: React.FC = () => {
@@ -126,6 +134,46 @@ export const Analytics: React.FC = () => {
           </BarChart>
         </ResponsiveContainer>
       </div>
+
+      {/* Response Rate by Industry */}
+      {stats.industryStats?.length > 0 && (
+        <div style={{ marginTop: "24px" }}>
+          <h4 style={{ margin: "0 0 12px 0", color: "#475569" }}>
+            Response Rate by Industry
+          </h4>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "8px",
+            }}
+          >
+            {stats.industryStats.map((item) => (
+              <div
+                key={item.industry}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  backgroundColor: "#f8fafc",
+                  padding: "10px 14px",
+                  borderRadius: "8px",
+                  border: "1px solid #e2e8f0",
+                  fontSize: "14px",
+                }}
+              >
+                <span style={{ color: "#0f172a" }}>{item.industry}</span>
+                <span style={{ color: "#64748b" }}>
+                  {item.responseRate}%{" "}
+                  <span style={{ color: "#94a3b8" }}>
+                    ({item.responses}/{item.total})
+                  </span>
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
