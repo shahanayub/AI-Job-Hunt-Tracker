@@ -9,7 +9,7 @@ import {
   Cell,
 } from "recharts";
 
-import { API_BASE_URL } from "./config";
+import { API_BASE_URL } from "../config";
 
 interface IndustryStat {
   industry: string;
@@ -35,7 +35,7 @@ export const Analytics: React.FC = () => {
 
   const fetchStats = async () => {
     try {
-      const res = await fetch("${API_BASE_URL}/jobs/stats");
+      const res = await fetch(`${API_BASE_URL}/jobs/stats`);
       const data = await res.json();
       setStats(data);
     } catch (err) {

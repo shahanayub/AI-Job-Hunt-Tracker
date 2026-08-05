@@ -12,7 +12,7 @@ import {
 } from "@dnd-kit/core";
 import type { DragEndEvent } from "@dnd-kit/core";
 import { Analytics } from "../components/Analytics";
-import { API_BASE_URL } from "./config";
+import { API_BASE_URL } from "../config";
 
 const COLUMNS = [
   { id: "Saved", title: "📑 Saved" },
@@ -41,7 +41,7 @@ function Dashboard() {
 
   async function loadJobs() {
     try {
-      const response = await fetch("${API_BASE_URL}/jobs");
+      const response = await fetch(`${API_BASE_URL}/jobs`);
       const data = await response.json();
       setJobs(data);
     } catch (err) {
@@ -58,7 +58,7 @@ function Dashboard() {
       });
       setEditingJob(null);
     } else {
-      await fetch("${API_BASE_URL}/jobs", {
+      await fetch(`${API_BASE_URL}/jobs`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(job),
@@ -78,7 +78,7 @@ function Dashboard() {
     setLoadingAnalysis(true);
     try {
       const resumeResponse = await fetch(
-        "${API_BASE_URL}/resume/latest"
+        `${API_BASE_URL}/resume/latest`
       );
       const resume = await resumeResponse.json();
 
@@ -87,7 +87,7 @@ function Dashboard() {
         return;
       }
 
-      const response = await fetch("${API_BASE_URL}/analyze", {
+      const response = await fetch(`${API_BASE_URL}/analyze`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -138,7 +138,7 @@ function Dashboard() {
     );
 
     try {
-      await fetch(`http://localhost:5000/jobs/${activeJobId}`, {
+      await fetch(`${API_BASE_URL}/jobs/${activeJobId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...activeJob, status: targetStatus }),

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { API_BASE_URL } from "./config";
+import { API_BASE_URL } from "../config";
 
 interface KanbanCardProps {
   job: any;
@@ -64,12 +64,12 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
     setGeneratingEmail(true);
     setShowEmailModal(true);
     try {
-      const res = await fetch("${API_BASE_URL}/generate-email", {
+      const res = await fetch(`${API_BASE_URL}/jobs/generate-email`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           company: job.company,
-          position: job.position,
+          position: job.position,  
           notes: job.notes,
         }),
       });
@@ -87,7 +87,7 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
   if (!emailDraft) return;
 
   try {
-    const res = await fetch("${API_BASE_URL}/api/send-email", {
+    const res = await fetch(`${API_BASE_URL}/api/send-email`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -101,7 +101,7 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
 
     if (res.status === 401) {
       // Prompt user to authenticate if tokens aren't set
-      const authRes = await fetch("${API_BASE_URL}/api/auth/google");
+      const authRes = await fetch(`${API_BASE_URL}/api/auth/google`);
       const { url } = await authRes.json();
       window.open(url, "_blank");
     } else if (data.success) {

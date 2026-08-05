@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { API_BASE_URL } from "./config";
+import { API_BASE_URL } from "../config";
 
 function ResumeUpload() {
   const [file, setFile] = useState<File | null>(null);
@@ -16,7 +16,7 @@ function ResumeUpload() {
     formData.append("resume", file);
 
     try {
-      const response = await fetch("${API_BASE_URL}/resume/upload", {
+      const response = await fetch(`${API_BASE_URL}/resume/upload`, {
         method: "POST",
         body: formData,
       });
