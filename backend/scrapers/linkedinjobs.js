@@ -3,6 +3,12 @@ const { chromium } = require("playwright");
 async function scrapeLinkedIn(url) {
   const browser = await chromium.launch({
     headless: true,
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-gpu",
+    ],
   });
 
   const page = await browser.newPage();
@@ -22,7 +28,6 @@ async function scrapeLinkedIn(url) {
 
   // Job Title
   let title;
-
   try {
     title = await page.locator("h1").first().textContent();
   } catch {

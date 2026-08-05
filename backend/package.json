@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
+    "build": "npm install && npx playwright install chromium --with-deps",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -13,6 +14,7 @@
   "type": "commonjs",
   "dependencies": {
     "@google/genai": "^2.15.0",
+    "cheerio": "^1.2.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
@@ -25,4 +27,3 @@
     "recharts": "^3.10.1"
   }
 }
-
