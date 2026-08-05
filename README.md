@@ -5,7 +5,7 @@ An AI-powered full-stack platform designed for automated job scraping, ATS resum
 ## Live Demo & Services
 **Frontend Web App (Vercel):** [https://ai-job-hunt-tracker.vercel.app]
 **Backend API Service (Render):** [https://ai-job-hunt-tracker.onrender.com]
-**Project Report:** [View Project Report PDF](./Project_Report.pdf?raw=true)
+**Project Report:** [View Project Report PDF](../Project_Report.pdf?raw=true)
 
 ---
 
