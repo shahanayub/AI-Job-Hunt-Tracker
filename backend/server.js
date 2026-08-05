@@ -72,9 +72,16 @@ app.get("/api/auth/google/callback", async (req, res) => {
   }
 });
 
-// 3. Send Email: Fetch tokens from MongoDB
+// 3. Send Email: Fetch tokens from MongoDB with key fallbacks
 app.post("/api/send-email", async (req, res) => {
-  const { to, subject, body } = req.body;
+  // Fallbacks ensure variables are never empty if frontend key names vary
+  const to = req.body.to || req.body.recipientEmail || "recruiter@example.com";
+  const subject = req.body.subject || "Follow-up Application Update";
+  const body = req.body.emailBody || req.body.body || req.body.text || "";
+
+  if (!body) {
+    return res.status(400).json({ error: "Email body content is missing." });
+  }
 
   try {
     // Fetch tokens from database

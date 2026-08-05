@@ -60,30 +60,35 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
   };
 
   // Generate Email using Gemini API
-  const handleGenerateEmail = async () => {
-    setGeneratingEmail(true);
-    setShowEmailModal(true);
-    try {
-      const res = await fetch(`${API_BASE_URL}/generate-email`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          company: job.company,
-          position: job.position,  
-          notes: job.notes,
-        }),
-      });
-      const data = await res.json();
-      setEmailDraft(data);
-    } catch (err) {
-      console.error(err);
-      alert("Failed to draft follow-up email.");
-    } finally {
-      setGeneratingEmail(false);
-    }
-  };
+const handleGenerateEmail = async () => {
+  setGeneratingEmail(true);
+  setShowEmailModal(true);
+  try {
+    const res = await fetch(`${API_BASE_URL}/generate-email`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        company: job.company,
+        position: job.position, 
+        notes: job.notes,
+      }),
+    });
+    const data = await res.json();
+    
+    // Fallback parsing to guarantee non-empty strings
+    setEmailDraft({
+      subject: data.subject || `Follow-up: ${job.position} at ${job.company}`,
+      body: data.emailBody || data.body || data.text || data.message || "",
+    });
+  } catch (err) {
+    console.error(err);
+    alert("Failed to draft follow-up email.");
+  } finally {
+    setGeneratingEmail(false);
+  }
+};
 
- const handleSendEmailViaApi = async () => {
+const handleSendEmailViaApi = async () => {
   if (!emailDraft) return;
 
   try {
@@ -91,16 +96,15 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        to: job.companyEmail || "recruiter@example.com",
-        subject: emailDraft.subject,
-        body: emailDraft.body,
+        recipientEmail: job.companyEmail || "recruiter@example.com",
+        subject: emailDraft.subject || `Follow-up on ${job.position} position`,
+        emailBody: emailDraft.body, // Passed as emailBody to match Nodemailer
       }),
     });
 
     const data = await res.json();
 
     if (res.status === 401) {
-      // Prompt user to authenticate if tokens aren't set
       const authRes = await fetch(`${API_BASE_URL}/api/auth/google`);
       const { url } = await authRes.json();
       window.open(url, "_blank");
