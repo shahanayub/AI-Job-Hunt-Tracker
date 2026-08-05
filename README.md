@@ -6,3 +6,13 @@ Continued backend learning.
 Planning authentication and Postman testing.
 Scarping 20 Jobs from different platforms.
 Finalizing the project and initiating deployment. 
+
+## Tech Stack
+- React
+- Express
+- Node.js
+- MongoDB
+- Gemini API
+- Playwright
+- Axios
+- Cheerio
