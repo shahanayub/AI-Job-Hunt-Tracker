@@ -357,13 +357,21 @@ app.post("/generate-email", async (req, res) => {
     
     Return pure JSON with keys: "subject" and "body". No markdown formatting or extra text outside JSON.`;
 
-    const rawResult = await analyzeResume(prompt, "Email Generation Context");
+    let rawResult = await analyzeResume(prompt, "Email Generation Context");
+    
+    // Clean up Markdown code block wrappers if Gemini included them
+    rawResult = rawResult.replace(/```json/g, "").replace(/```/g, "").trim();
+
     const result = JSON.parse(rawResult);
 
     res.json(result);
   } catch (err) {
     console.error("Email Generation Error:", err);
-    res.status(500).json({ message: "Failed to generate follow up email draft." });
+    // Fallback response if JSON parsing fails
+    res.json({
+      subject: `Follow-up on ${req.body.position || "Application"} - ${req.body.company || ""}`,
+      body: `Dear Hiring Manager,\n\nI am following up on my application for the ${req.body.position} position at ${req.body.company}. I remain very interested in the role and would welcome an update on my status.\n\nBest regards,`
+    });
   }
 });
 
