@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import { API_BASE_URL } from "./config";
+
 
 type JobFormProps = {
   onAddJob: (job: any) => void
@@ -42,7 +44,7 @@ async function handleScrape() {
 
   try {
 
-    const response = await fetch("http://localhost:5000/scrape", {
+    const response = await fetch("${API_BASE_URL}/scrape", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
