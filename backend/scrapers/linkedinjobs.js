@@ -1,53 +1,38 @@
-const { chromium } = require("playwright");
+const axios = require("axios");
+const cheerio = require("cheerio");
 
 async function scrapeLinkedIn(url) {
-  const browser = await chromium.launch({
-    headless: true,
-    args: [
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--disable-dev-shm-usage",
-      "--disable-gpu",
-    ],
-  });
-
-  const page = await browser.newPage();
-
-  await page.goto(url, {
-    waitUntil: "domcontentloaded",
-  });
-
-  // Wait until the job page loads
-  await page.waitForSelector("h1, .show-more-less-html__markup");
-
-  // Company
-  const company = await page
-    .locator('a[href*="/company/"]')
-    .first()
-    .textContent();
-
-  // Job Title
-  let title;
   try {
-    title = await page.locator("h1").first().textContent();
-  } catch {
-    const pageTitle = await page.title();
-    title =
-      pageTitle.split(" hiring ")[1]?.split(" in ")[0] || pageTitle;
+    const { data } = await axios.get(url, {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept-Language": "en-US,en;q=0.9",
+      },
+    });
+
+    const $ = cheerio.load(data);
+
+    const company =
+      $('a[href*="/company/"]').first().text().trim() ||
+      $(".topcard__org-name-link").first().text().trim() ||
+      "Unknown Company";
+
+    const title =
+      $("h1").first().text().trim() ||
+      $("h1.top-card-layout__title").text().trim() ||
+      "Unknown Title";
+
+    const description =
+      $(".show-more-less-html__markup").text().trim() ||
+      $(".description__text").text().trim() ||
+      "No description found";
+
+    return { company, title, description };
+  } catch (error) {
+    console.error("LinkedIn Scrape Error:", error.message);
+    throw new Error(`Failed to scrape LinkedIn job page: ${error.message}`);
   }
-
-  // Job Description
-  const description = await page
-    .locator(".show-more-less-html__markup")
-    .innerText();
-
-  await browser.close();
-
-  return {
-    company: company.trim(),
-    title: title.trim(),
-    description: description.trim(),
-  };
 }
 
 module.exports = scrapeLinkedIn;

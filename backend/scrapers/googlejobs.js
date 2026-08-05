@@ -1,35 +1,27 @@
-const { chromium } = require("playwright");
+const axios = require("axios");
+const cheerio = require("cheerio");
 
 async function scrapeGoogleJobs(url) {
-  const browser = await chromium.launch({
-    headless: true,
-    args: [
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--disable-dev-shm-usage",
-      "--disable-gpu",
-    ],
-  });
+  try {
+    const { data } = await axios.get(url, {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept-Language": "en-US,en;q=0.9",
+      },
+    });
 
-  const page = await browser.newPage();
+    const $ = cheerio.load(data);
 
-  await page.goto(url, {
-    waitUntil: "domcontentloaded",
-  });
+    const title = $("h2.p1N2lc").first().text().trim() || "Google Job Title";
+    const company = "Google";
+    const description = $("main").text().trim() || "No description found";
 
-  await page.waitForSelector("h2.p1N2lc");
-
-  const company = await page.locator("text=Google").first().textContent();
-  const title = await page.locator("h2.p1N2lc").textContent();
-  const description = await page.locator("main").innerText();
-
-  await browser.close();
-
-  return {
-    company: company.trim(),
-    title: title.trim(),
-    description: description.trim(),
-  };
+    return { company, title, description };
+  } catch (error) {
+    console.error("Google Jobs Scrape Error:", error.message);
+    throw new Error(`Failed to scrape Google job page: ${error.message}`);
+  }
 }
 
 module.exports = scrapeGoogleJobs;
