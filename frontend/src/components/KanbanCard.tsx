@@ -59,7 +59,8 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
     return due <= today;
   };
 
-  // Generate Email using Gemini API
+
+// Generate Email using Gemini API
 const handleGenerateEmail = async () => {
   setGeneratingEmail(true);
   setShowEmailModal(true);
@@ -69,20 +70,29 @@ const handleGenerateEmail = async () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         company: job.company,
-        position: job.position, 
+        position: job.position,  
         notes: job.notes,
       }),
     });
-    const data = await res.json();
     
-    // Fallback parsing to guarantee non-empty strings
+    const data = await res.json();
+    console.log("Gemini API Response:", data); // Check F12 Console to see exact output
+
+    // Safely extract subject and body across all variations
+    const draftSubject = data.subject || `Follow-up: ${job.position} at ${job.company}`;
+    const draftBody = data.body || data.emailBody || data.text || data.message || `Dear Hiring Team,\n\nI am writing to follow up on my application for the ${job.position} position at ${job.company}.\n\nBest regards,`;
+
     setEmailDraft({
-      subject: data.subject || `Follow-up: ${job.position} at ${job.company}`,
-      body: data.emailBody || data.body || data.text || data.message || "",
+      subject: draftSubject,
+      body: draftBody
     });
   } catch (err) {
-    console.error(err);
-    alert("Failed to draft follow-up email.");
+    console.error("Generate Email Error:", err);
+    // Hardcoded fallback so the body is NEVER empty
+    setEmailDraft({
+      subject: `Follow-up: ${job.position} at ${job.company}`,
+      body: `Dear Hiring Manager,\n\nI am following up on my application for the ${job.position} position at ${job.company}. I remain very interested in the role.\n\nBest regards,`
+    });
   } finally {
     setGeneratingEmail(false);
   }
