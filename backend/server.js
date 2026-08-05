@@ -359,7 +359,6 @@ app.post("/generate-email", async (req, res) => {
 
     let rawResult = await analyzeResume(prompt, "Email Generation Context");
     
-    // Clean up Markdown code block wrappers if Gemini included them
     rawResult = rawResult.replace(/```json/g, "").replace(/```/g, "").trim();
 
     const result = JSON.parse(rawResult);
