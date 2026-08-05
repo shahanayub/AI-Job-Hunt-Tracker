@@ -64,7 +64,7 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
     setGeneratingEmail(true);
     setShowEmailModal(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/jobs/generate-email`, {
+      const res = await fetch(`${API_BASE_URL}/generate-email`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
