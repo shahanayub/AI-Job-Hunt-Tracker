@@ -26,6 +26,16 @@ const jobSchema = new mongoose.Schema({
     default: "Applied",
   },
 
+  industry: {
+    type: String,
+    default: "Technology",
+  },
+
+  roleType: {
+    type: String,
+    default: "Full-time",
+  },
+
   applicationDate: {
     type: Date,
     default: Date.now,

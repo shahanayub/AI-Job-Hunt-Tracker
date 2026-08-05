@@ -1,5 +1,7 @@
 require('dotenv').config();
 
+const Token = require("./models/Token");
+
 const scrapeGoogle = require("./scrapers/googlejobs");
 const scrapeLinkedIn = require("./scrapers/linkedinjobs");
 
@@ -10,7 +12,7 @@ const { analyzeResume } = require("./ai/gemini");
 const mongoose = require('mongoose');
 const cors = require('cors');
 const express = require('express');
-const { google } = require("googleapis"); // Added Google APIs package
+const { google } = require("googleapis");
 
 const app = express();
 
@@ -27,9 +29,6 @@ const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_REDIRECT_URI
 );
 
-// In-memory token store (persists for server runtime)
-let storedTokens = null;
-
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => console.log(err));
@@ -42,7 +41,7 @@ app.get('/', (req, res) => {
 // GOOGLE OAUTH2 & GMAIL API ROUTES
 // ==========================================
 
-// 1. Generate Auth URL for frontend redirect
+// 1. Generate Auth URL for frontend login redirect
 app.get("/api/auth/google", (req, res) => {
   const authUrl = oauth2Client.generateAuthUrl({
     access_type: "offline", // Ensures we receive a Refresh Token
@@ -52,33 +51,42 @@ app.get("/api/auth/google", (req, res) => {
   res.json({ url: authUrl });
 });
 
-// 2. OAuth Callback Route to store OAuth tokens
+// 2. OAuth Callback: Save tokens to MongoDB
 app.get("/api/auth/google/callback", async (req, res) => {
   const { code } = req.query;
   try {
     const { tokens } = await oauth2Client.getToken(code);
     oauth2Client.setCredentials(tokens);
-    storedTokens = tokens;
-    res.send("<h2>Authentication successful! You can close this window and return to the app.</h2>");
+
+    // Save or update tokens in database
+    await Token.findOneAndUpdate(
+      { userId: "default_user" },
+      { tokens },
+      { upsert: true, new: true }
+    );
+
+    res.send("<h2>Authentication successful! You can close this tab and return to the app.</h2>");
   } catch (error) {
     console.error("Error exchanging OAuth code:", error);
     res.status(500).send("Authentication failed");
   }
 });
 
-// 3. Send Email Programmatically via Gmail API
+// 3. Send Email: Fetch tokens from MongoDB
 app.post("/api/send-email", async (req, res) => {
   const { to, subject, body } = req.body;
 
-  if (!storedTokens) {
-    return res.status(401).json({ error: "User not authenticated with Gmail" });
-  }
-
   try {
-    oauth2Client.setCredentials(storedTokens);
+    // Fetch tokens from database
+    const savedTokenDoc = await Token.findOne({ userId: "default_user" });
+
+    if (!savedTokenDoc || !savedTokenDoc.tokens) {
+      return res.status(401).json({ error: "User not authenticated with Gmail" });
+    }
+
+    oauth2Client.setCredentials(savedTokenDoc.tokens);
     const gmail = google.gmail({ version: "v1", auth: oauth2Client });
 
-    // Format RFC 2822 standard email string
     const rawMessage = [
       `To: ${to}`,
       "Content-Type: text/plain; charset=utf-8",
@@ -115,6 +123,7 @@ app.get("/jobs", async (req, res) => {
   res.json(jobs);
 });
 
+// CREATE JOB ROUTE (Updated with Industry & RoleType)
 app.post("/jobs", async (req, res) => {
   const job = await Job.create({
     company: req.body.company,
@@ -122,6 +131,8 @@ app.post("/jobs", async (req, res) => {
     description: req.body.description || "",
     url: req.body.url || "",
     status: req.body.status || "Applied",
+    industry: req.body.industry || "Technology",
+    roleType: req.body.roleType || "Full-time",
     notes: req.body.notes || "",
     followUpDate: req.body.followUpDate || null,
     matchScore: req.body.matchScore || 0,
@@ -142,6 +153,7 @@ app.delete("/jobs/:id", async (req, res) => {
   });
 });
 
+// UPDATE/EDIT JOB ROUTE (Updated with Industry & RoleType)
 app.put("/jobs/:id", async (req, res) => {
   const oldJob = await Job.findById(req.params.id);
 
@@ -167,6 +179,8 @@ app.put("/jobs/:id", async (req, res) => {
       description: req.body.description,
       url: req.body.url,
       status: req.body.status,
+      industry: req.body.industry || oldJob.industry || "Technology",
+      roleType: req.body.roleType || oldJob.roleType || "Full-time",
       notes: req.body.notes,
       followUpDate: req.body.followUpDate,
       matchScore: req.body.matchScore,
@@ -275,16 +289,44 @@ app.get("/jobs/stats", async (req, res) => {
 
     const avgMatchScore = avgScoreResult.length > 0 ? Math.round(avgScoreResult[0].avgScore) : 0;
 
-    // Response rate (Interview + Offer) / Total Applied
+    // Overall Response rate (Interview + Offer) / Total Applied
     const totalAppliedOrHigher = statusMap.Applied + statusMap.Interview + statusMap.Offer + statusMap.Rejected;
     const totalPositiveResponses = statusMap.Interview + statusMap.Offer;
     const responseRate = totalAppliedOrHigher > 0 ? Math.round((totalPositiveResponses / totalAppliedOrHigher) * 100) : 0;
+
+    // Segmented Response Rate by Industry
+    const industryStats = await Job.aggregate([
+      {
+        $group: {
+          _id: "$industry",
+          total: { $sum: 1 },
+          responses: {
+            $sum: { $cond: [{ $in: ["$status", ["Interview", "Offer"]] }, 1, 0] }
+          }
+        }
+      },
+      {
+        $project: {
+          industry: "$_id",
+          total: 1,
+          responses: 1,
+          responseRate: {
+            $cond: [
+              { $gt: ["$total", 0] },
+              { $round: [{ $multiply: [{ $divide: ["$responses", "$total"] }, 100] }, 0] },
+              0
+            ]
+          }
+        }
+      }
+    ]);
 
     res.json({
       totalJobs,
       statusMap,
       avgMatchScore,
       responseRate,
+      industryStats,
       chartData: [
         { name: "Saved", value: statusMap.Saved, fill: "#94a3b8" },
         { name: "Applied", value: statusMap.Applied, fill: "#3b82f6" },
